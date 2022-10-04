@@ -41,16 +41,26 @@ namespace Masl_Disk_File_Converter
 
         static void DiskToFolder(string filename, string folderName)
         {
-            Console.WriteLine($"Reading Disk: \"{filename}\"");
+            Console.WriteLine($"Reading Disk:    \"{filename}\"");
             if (Directory.Exists(folderName))
                 Directory.Delete(folderName, true);
             Directory.CreateDirectory(folderName);
 
             byte[] diskData = File.ReadAllBytes(filename);
-            
-            ulong totalSize = BitConverter.ToUInt64(diskData, 0);
-            ushort partCount = BitConverter.ToUInt16(diskData, 8);
-            
+            //for (int i = 0; i < 100; i++)
+            //    Console.Write($"{diskData[512 + i]} ");
+            //Console.WriteLine();
+
+            int offset = 512;
+
+            ulong totalSize = BEC.ByteArrToUint64(diskData, offset);
+            offset += 8;
+            ushort partCount = BEC.ByteArrToUint16(diskData, offset);
+            offset += 2;
+
+            Console.WriteLine($"Disk Size:       {diskData.LongLength} Bytes");
+            Console.WriteLine($"Total Size:      {totalSize} Bytes");
+            Console.WriteLine($"Partition Count: {partCount}");
 
             using (StreamWriter writer = new StreamWriter($"{folderName}/diskInfos.txt"))
             {
@@ -61,9 +71,9 @@ namespace Masl_Disk_File_Converter
                 writer.WriteLine("Partition Count:");
                 writer.WriteLine(partCount);
             }
-            
-            
-            
+
+
+
         }
         
         static void FolderToDisk(string filename, string folderName)
