@@ -27,6 +27,12 @@ namespace Masl_Disk_File_Converter
             return BitConverter.ToUInt64(arr, 0);
         }
 
+        public static uint ByteArrToUint32(byte[] arr, int startIndex, bool switchByteArr = true)
+        {
+            arr = SwitchByteArr(arr, startIndex, 4, switchByteArr);
+            return BitConverter.ToUInt32(arr, 0);
+        }
+
         public static ushort ByteArrToUint16(byte[] arr, int startIndex, bool switchByteArr = true)
         {
             arr = SwitchByteArr(arr, startIndex, 2, switchByteArr);

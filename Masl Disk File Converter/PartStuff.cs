@@ -7,27 +7,26 @@ using System.Threading.Tasks;
 
 namespace Masl_Disk_File_Converter
 {
+    using static Program;
+
     public class PartStuff
     {
         public static void DiskToFolder(string filename, string folderName)
         {
-            Console.WriteLine($"Reading Disk:    \"{filename}\"");
+            Println($"Reading Disk:    \"{filename}\"");
             if (Directory.Exists(folderName))
                 Directory.Delete(folderName, true);
             Directory.CreateDirectory(folderName);
 
             byte[] diskData = File.ReadAllBytes(filename);
-            //for (int i = 0; i < 100; i++)
-            //    Console.Write($"{diskData[512 + i]} ");
-            //Console.WriteLine();
-
+            
             string signature = "";
             for (int i = 0; i < 7; i++)
                 signature += (char)diskData[i + 82];
-            Console.WriteLine($"Disk Signature:  \"{signature}\"");
+            Println($"Disk Signature:  \"{signature}\"");
             if (!signature.Equals("MRAPS01"))
             {
-                Console.WriteLine($"Partition Signature not supported");
+                Println($"Partition Signature not supported");
                 return;
             }
             
@@ -39,9 +38,9 @@ namespace Masl_Disk_File_Converter
             ushort partCount = BEC.ByteArrToUint16(diskData, offset);
             offset += 2;
 
-            Console.WriteLine($"Disk Size:       {diskData.LongLength} Bytes");
-            Console.WriteLine($"Total Size:      {totalSize} Bytes");
-            Console.WriteLine($"Partition Count: {partCount}");
+            Println($"Disk Size:       {diskData.LongLength} Bytes");
+            Println($"Total Size:      {totalSize} Bytes");
+            Println($"Partition Count: {partCount}");
 
             using (StreamWriter writer = new StreamWriter($"{folderName}/diskInfos.txt"))
             {
@@ -110,7 +109,9 @@ namespace Masl_Disk_File_Converter
                         using (BinaryWriter binWriter = new BinaryWriter(new FileStream(folderName + $"/{i}/raw.bin", FileMode.Create)))
                             binWriter.Write(rawPartData);
 
+                        StartIndent("PART");
                         FileStuff.PartToFolder(folderName + $"/{i}/raw.bin", folderName + $"/{i}/data");
+                        EndIndent("PART");
                     }
                 }
             }
@@ -121,7 +122,7 @@ namespace Masl_Disk_File_Converter
 
         public static void FolderToDisk(string filename, string folderName)
         {
-            Console.WriteLine($"Reading Folder: \"{folderName}\"");
+            Println($"Reading Folder: \"{folderName}\"");
             Directory.CreateDirectory(folderName);
 
         }
