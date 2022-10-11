@@ -120,31 +120,7 @@ namespace Masl_Disk_File_Converter
 
         }
 
-        /*
-            Partition ID:
-            0
-        
-            Name:
-            Boot Partition
 
-            Description:
-            This is the Bootsector.
-
-            Drive Name:
-            boot_sector
-
-            Partition Size (Bytes):
-            512
-
-            Partition Location:
-            0
-        
-            Partition Type:
-            4
-
-            Filesystem Type:
-            0
-        */
 
         /*
             enum PartitionType : uint8_t
@@ -176,6 +152,8 @@ namespace Masl_Disk_File_Converter
             public ulong partSize, partLocation;
             public byte partType;
             public byte fsType;
+
+            public byte[] rawData;
             
         }
         
@@ -219,13 +197,32 @@ namespace Masl_Disk_File_Converter
                     info.partSize = ulong.Parse(reader.ReadLine());
                     Println($"Partition Size:         {info.partSize} Bytes");
 
+                    reader.ReadLine();
+                    info.partLocation = ulong.Parse(reader.ReadLine());
+                    Println($"Partition Location:     {info.partLocation}");
 
+                    reader.ReadLine();
+                    info.partType = byte.Parse(reader.ReadLine());
+                    Println($"Partition Type:         {info.partType}");
 
+                    reader.ReadLine();
+                    info.fsType = byte.Parse(reader.ReadLine());
+                    Println($"FS Type:                {info.fsType}");
+
+                    if (Directory.Exists(folderName + $"/{i}/data"))
+                    {
+                        StartIndent("FS DATA");
+                        FileStuff.FolderToPart(folderName + $"/{i}/raw.bin", folderName + $"/{i}/data");
+                        EndIndent("FS DATA");
+                    }
+
+                    info.rawData = File.ReadAllBytes(folderName + $"/{i}/raw.bin");
 
                     partitions.Add(info);
                     EndIndent($"PART {i}");
                 }
 
+                // Write Data
 
             }
 
