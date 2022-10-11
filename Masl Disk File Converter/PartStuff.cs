@@ -120,10 +120,114 @@ namespace Masl_Disk_File_Converter
 
         }
 
+        /*
+            Partition ID:
+            0
+        
+            Name:
+            Boot Partition
+
+            Description:
+            This is the Bootsector.
+
+            Drive Name:
+            boot_sector
+
+            Partition Size (Bytes):
+            512
+
+            Partition Location:
+            0
+        
+            Partition Type:
+            4
+
+            Filesystem Type:
+            0
+        */
+
+        /*
+            enum PartitionType : uint8_t
+            {
+                Undefined = 0,
+                //Empty = 1,
+                Normal = 2,
+                Reserved = 3,
+                Boot = 4,
+                PartitionData = 5
+            };
+         */
+
+        /*
+            enum FilesystemInterfaceType : uint8_t
+            {
+                None = 0,
+                Generic = 1,
+                Mrafs = 2
+            };
+        */
+
+
+        // LEN IS USHORT
+        public class PartInfo
+        {
+            public string partName, description, driveName;
+            public bool hidden;
+            public ulong partSize, partLocation;
+            public byte partType;
+            public byte fsType;
+            
+        }
+        
         public static void FolderToDisk(string filename, string folderName)
         {
             Println($"Reading Folder: \"{folderName}\"");
-            Directory.CreateDirectory(folderName);
+
+            int partCount = Directory.GetDirectories(folderName).Length;
+            Println($"Partition Count: {partCount}");
+            ulong totalDiskSize = 0;
+
+            List<PartInfo> partitions = new List<PartInfo>();
+            using (StreamReader reader = new StreamReader(folderName + "/diskInfos.txt"))
+            {
+                reader.ReadLine();
+                totalDiskSize = ulong.Parse(reader.ReadLine());
+                Println($"Total Disk Size: {totalDiskSize} Bytes");
+                for (int i = 0; i < 5; i++)
+                    reader.ReadLine();
+                
+                for (int i = 0; i < partCount; i++)
+                {
+                    StartIndent($"PART {i}");
+                    PartInfo info = new PartInfo();
+                    reader.ReadLine();
+                    reader.ReadLine(); // Part Count
+
+                    reader.ReadLine();
+                    info.partName = reader.ReadLine();
+                    Println($"Partition Name:        \"{info.partName}\"");
+
+                    reader.ReadLine();
+                    info.description = reader.ReadLine();
+                    Println($"Partition Description: \"{info.description}\"");
+
+                    reader.ReadLine();
+                    info.driveName = reader.ReadLine();
+                    Println($"Partition Drive Name:  \"{info.driveName}\"");
+
+                    reader.ReadLine();
+                    info.partSize = ulong.Parse(reader.ReadLine());
+                    Println($"Partition Size:         {info.partSize} Bytes");
+
+
+
+
+                    partitions.Add(info);
+                    EndIndent($"PART {i}");
+                }
+
+
+            }
 
         }
     }

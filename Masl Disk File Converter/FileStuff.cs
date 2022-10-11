@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 namespace Masl_Disk_File_Converter
 {
     using static Program;
- 
+
     struct FSPartData
     {
         public ulong location, size;
@@ -29,7 +29,7 @@ namespace Masl_Disk_File_Converter
         public ulong location;
         public ulong size;
     }
-    
+
     struct FolderData
     {
         public BaseData baseData;
@@ -42,7 +42,6 @@ namespace Masl_Disk_File_Converter
             Println($"Reading Disk:           \"{filename}\"");
             if (Directory.Exists(folderName))
                 Directory.Delete(folderName, true);
-            Directory.CreateDirectory(folderName);
 
             byte[] partData = File.ReadAllBytes(filename);
 
@@ -55,6 +54,7 @@ namespace Masl_Disk_File_Converter
                 Println($"! Partition Signature not supported");
                 return;
             }
+            Directory.CreateDirectory(folderName);
 
             int offset = 7;
 
@@ -191,9 +191,24 @@ namespace Masl_Disk_File_Converter
                         byte[] fData = new byte[file.size];
                         for (ulong i2 = 0; i2 < file.size; i2++)
                             fData[i2] = partData[file.location + i2];
-                        
+
                         fWriter.Write(fData);
                     }
+
+                    FileInfo fileInfo = new FileInfo(name);
+                    
+                    fileInfo.IsReadOnly = file.baseData.readOnly;
+
+                    if (file.baseData.hidden)
+                        fileInfo.Attributes |= FileAttributes.Hidden;
+                    else
+                        fileInfo.Attributes &= ~FileAttributes.Hidden;
+
+                    if (file.baseData.sysFile)
+                        fileInfo.Attributes |= FileAttributes.System;
+                    else
+                        fileInfo.Attributes &= ~FileAttributes.System;
+
                 }
             }
 
