@@ -371,8 +371,8 @@ namespace Masl_Disk_File_Converter
 
                 // EMPTY
                 {
-                    offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr(lastDiskMemIndex), offset);
                     offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr((ulong)rawData.LongLength - lastDiskMemIndex), offset);
+                    offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr(lastDiskMemIndex), offset);
                     rawData[offset++] = 1;
                 }
             }
@@ -387,8 +387,12 @@ namespace Masl_Disk_File_Converter
                 for (int i2 = 0; i2 < info.baseData.path.Length; i2++)
                     rawData[offset++] = (byte)info.baseData.path[i2];
 
-                offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr((ushort)info.location), offset);
-                offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr((ushort)info.size), offset);
+                offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr(info.location), offset);
+                offset += BEC.ByteArrIntoArr(rawData, BEC.Uint64ToByteArr(info.size), offset);
+
+                for (ulong i2 = 0; i2 < info.size; i2++)
+                    rawData[info.location + i2] = info.rawData[i2];
+                
             }
 
             for (int i = 0; i < folders.Count; i++)

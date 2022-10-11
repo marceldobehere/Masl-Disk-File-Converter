@@ -173,7 +173,7 @@ namespace Masl_Disk_File_Converter
                 Println($"Total Disk Size: {totalDiskSize} Bytes");
                 for (int i = 0; i < 5; i++)
                     reader.ReadLine();
-                
+
                 for (int i = 0; i < partCount; i++)
                 {
                     StartIndent($"PART {i}");
@@ -222,10 +222,17 @@ namespace Masl_Disk_File_Converter
                     EndIndent($"PART {i}");
                 }
 
-                // Write Data
-
             }
 
+            Println($"Writing Disk");
+
+            byte[] data = new byte[totalDiskSize];
+            ulong offset = 0;
+            for (int i = 0; i < partCount; i++)
+                foreach (byte b in File.ReadAllBytes(folderName + $"/{i}/raw.bin"))
+                    data[offset++] = b;
+
+            File.WriteAllBytes(filename, data);
         }
     }
 }
